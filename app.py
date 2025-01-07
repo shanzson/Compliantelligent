@@ -4,6 +4,8 @@ import json
 from flask import Flask, request, jsonify, render_template, stream_with_context, Response
 from analyzer.smart_contract_analyzer import SmartContractAnalyzer  # Ensure this path is correct
 from dotenv import load_dotenv
+from flask_cors import CORS
+
 
 
 # Load environment variables from .env file
@@ -12,9 +14,9 @@ load_dotenv()
 # Now you can access the variables
 api_key = os.getenv('OPENAI_API_KEY')
 
-
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app, resources={r"/analyze": {"origins": "*", "methods": ["POST"]}})
 
 # Home route to serve the main page
 @app.route('/')
@@ -22,10 +24,16 @@ def home():
     return render_template('index.html')  # Ensure index.html exists in the templates folder
 
 # Analyze route to process the uploaded ZIP file
-@app.route('/analyze', methods=['POST'])
+# @app.route('/analyze', methods=['POST'])
 @app.route('/analyze', methods=['POST'])
 def analyze():
+    # print('request.method : %s',  request.method)
+    # print('request.files : %s', request.files)
+    # print('request.args : %s', request.args)
+    # print('request.form : %s', request.form)
+    # print('request.values : %s', request.values)
     try:
+        print(request.files)
         # Validate and retrieve the uploaded file
         if 'zipFile' not in request.files:
             return jsonify({'error': 'No file uploaded. Please upload a ZIP file.'}), 400
