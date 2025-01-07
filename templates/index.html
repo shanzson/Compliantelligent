@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Contract Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Define light and dark theme variables */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --input-bg-color: #f9f9f9;
+            --input-border-color: #ccc;
+            --button-bg-color: #007bff;
+            --button-text-color: #ffffff;
+            --progress-bg-color: #f3f3f3;
+            --progress-bar-color: #4caf50;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+            --input-bg-color: #1e1e1e;
+            --input-border-color: #444;
+            --button-bg-color: #4caf50;
+            --button-text-color: #ffffff;
+            --progress-bg-color: #333;
+            --progress-bar-color: #007bff;
+        }
+
+        /* General styles */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+        }
+
+        input, textarea, select, button {
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--input-border-color);
+        }
+
+        button {
+            background-color: var(--button-bg-color);
+            color: var(--button-text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: var(--progress-bg-color);
+            border: 1px solid var(--input-border-color);
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 20px;
+            background-color: var(--progress-bar-color);
+            text-align: center;
+            color: var(--button-text-color);
+            line-height: 20px;
+            border-radius: 5px;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: var(--button-bg-color);
+            color: var(--button-text-color);
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme toggle button -->
+    <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+
+    <div class="container">
+        <h1>Smart Contract Analyzer</h1>
+
+        <form id="uploadForm" enctype="multipart/form-data">
+            <label for="zipFile">Upload a ZIP File:</label>
+            <input type="file" id="zipFile" name="zipFile" accept=".zip">
+            <br><br>
+
+            <label>Select EIPs to Analyze:</label>
+            <div>
+                <input type="checkbox" value="ERC20" name="eip"> ERC20
+                <input type="checkbox" value="ERC721" name="eip"> ERC721
+                <input type="checkbox" value="ERC1155" name="eip"> ERC1155
+            </div>
+            <br>
+
+            <button type="button" onclick="analyze()">Analyze</button>
+        </form>
+
+        <div class="progress-container" style="display: none;">
+            <div id="progressBar" class="progress-bar">0%</div>
+        </div>
+        
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+async function analyze() {
+    const fileInput = document.getElementById('zipFile');
+    const checkboxes = document.querySelectorAll('input[name="eip"]:checked');
+    const progressContainer = document.querySelector('.progress-container');
+    const progressBar = document.getElementById('progressBar');
+    const resultsDiv = document.getElementById('results');
+
+    // Reset progress and results
+    progressBar.style.width = '0%';
+    progressBar.textContent = '0%';
+    resultsDiv.innerHTML = '';
+    progressContainer.style.display = 'none'; // Hide progress bar initially
+
+    if (!fileInput.files.length) {
+        alert('Please upload a ZIP file.');
+        return;
+    }
+
+    if (checkboxes.length === 0) {
+        alert('Please select at least one EIP to analyze.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('zipFile', fileInput.files[0]);
+    const selectedEIPs = Array.from(checkboxes).map(cb => cb.value);
+    formData.append('eips', JSON.stringify(selectedEIPs));
+
+    // Show progress bar when analysis starts
+    progressContainer.style.display = 'block';
+
+    try {
+        const response = await fetch('/analyze', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Process results
+            progressBar.style.width = '100%';
+            progressBar.textContent = '100%';
+            displayResults(data.data);
+        } else {
+            // Show error message
+            alert(data.error || 'An error occurred while analyzing the files.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An unexpected error occurred. Please try again.');
+    }
+}
+
+function displayResults(analysisResults) {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '<h2>Analysis Results</h2>';
+    for (const [filename, result] of Object.entries(analysisResults)) {
+        let html = `<h3>${filename}</h3>`;
+        if (result.error) {
+            html += `<p>Error: ${result.error}</p>`;
+        } else {
+            html += `<p>OpenZeppelin Imports: ${result.oz_modules.join(', ')}</p>`;
+            html += `<p>EIP Compliance:</p><ul>`;
+            for (const [eip, compliance] of Object.entries(result.compliance)) {
+                html += `<li>${eip}: ${compliance}</li>`;
+            }
+            html += '</ul>';
+        }
+        resultsDiv.innerHTML += html;
+    }
+}
+
+    </script>
+</body>
+</html>
