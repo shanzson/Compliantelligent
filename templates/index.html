@@ -112,7 +112,11 @@
         </div>
         
 
+        <div id="mario-loading" style="display: none; text-align: center;">
+            <img src="{{ url_for('static', filename='images/mario-jump.gif') }}" alt="Loading..." />
+        </div>
         <div id="results"></div>
+        
     </div>
 
     <script>
@@ -122,12 +126,14 @@ async function analyze() {
     const progressContainer = document.querySelector('.progress-container');
     const progressBar = document.getElementById('progressBar');
     const resultsDiv = document.getElementById('results');
+    const marioLoading = document.getElementById('mario-loading'); // Mario animation
 
     // Reset progress and results
     progressBar.style.width = '0%';
     progressBar.textContent = '0%';
     resultsDiv.innerHTML = '';
     progressContainer.style.display = 'none'; // Hide progress bar initially
+    marioLoading.style.display = 'none'; // Hide Mario animation initially
 
     if (!fileInput.files.length) {
         alert('Please upload a ZIP file.');
@@ -144,8 +150,9 @@ async function analyze() {
     const selectedEIPs = Array.from(checkboxes).map(cb => cb.value);
     formData.append('eips', JSON.stringify(selectedEIPs));
 
-    // Show progress bar when analysis starts
+    // Show progress bar and Mario animation when analysis starts
     progressContainer.style.display = 'block';
+    marioLoading.style.display = 'block';
 
     try {
         const response = await fetch('/analyze', {
@@ -167,6 +174,9 @@ async function analyze() {
     } catch (error) {
         console.error('Error:', error);
         alert('An unexpected error occurred. Please try again.');
+    } finally {
+        // Hide Mario animation when analysis is complete
+        marioLoading.style.display = 'none';
     }
 }
 
