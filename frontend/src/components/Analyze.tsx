@@ -8,6 +8,9 @@ const FileAnalyzer = () => {
   const [error, setError] = useState("");
   const [eips, setEips] = useState<string[]>([]);
   const [results, setResults] = useState<any | null>(null);
+  const [resultsData, setResultsData] = useState<any>(
+    localStorage.getItem("formattedData") || ""
+  );
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -53,6 +56,29 @@ const FileAnalyzer = () => {
       // Assuming the server responds with JSON
       setResults(data);
       console.log(data);
+      const formatted = Object.entries(data.data)
+        .map(([key, value]) => {
+          return `
+          <h2 style="font-size: 1.5em; font-weight: bold;">${key}</h2>
+          <ul>
+            <li><strong>Compliance:</strong></li>
+            <ul>
+              <li><strong>ERC721:</strong> ${
+                (value as any).compliance.ERC721
+              }</li>
+            </ul>
+            <li><strong>oz_modules:</strong></li>
+            <ul>
+              ${(value as any).oz_modules
+                .map((module: any) => `<li>${module}</li>`)
+                .join("")}
+            </ul>
+          </ul>
+          `;
+        })
+        .join("\n");
+      localStorage.setItem("formattedData", formatted);
+      setResultsData(formatted);
     } catch (err: any) {
       console.log(err);
       setError(err.message);
@@ -216,17 +242,22 @@ const FileAnalyzer = () => {
           </p>
         )}
         {/* {results?.data} */}
+        {/* {resultsData} */}
         <div className="">
-          {results?.data ? (
-            <div className="mt-4">
-              <h2 className="text-xl font-bold">Analysis Results:</h2>
-              <pre className="bg-gray-800 text-cyan-400 p-4 rounded text-wrap">
-                {JSON.stringify(results?.data, null, 2)}
-              </pre>
-            </div>
-          ) : (
+          {/* {results?.data ? ( */}
+          <div className="mt-4">
+            <h2 className="text-xl font-bold my-3">Analysis Results:</h2>
+            <pre
+              dangerouslySetInnerHTML={{ __html: resultsData }}
+              className="bg-gray-800 text-cyan-400 p-4 rounded text-wrap"
+            >
+              {/* {resultsData} */}
+            </pre>
+          </div>
+          {/* )  */}
+          {/* : (
             <p className="text-cyan-300 mt-4">No analysis results available.</p>
-          )}
+          )} */}
         </div>
       </div>
 
