@@ -3,72 +3,57 @@
 <head>
     <title>Smart Contract Analyzer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
+
     <style>
         /* Define light and dark theme variables */
         :root {
-            --bg-color: #ffffff;
-            --text-color: #000000;
-            --input-bg-color: #f9f9f9;
-            --input-border-color: #ccc;
-            --button-bg-color: #007bff;
-            --button-text-color: #ffffff;
-            --progress-bg-color: #f3f3f3;
-            --progress-bar-color: #4caf50;
-        }
-
-        [data-theme="dark"] {
             --bg-color: #121212;
-            --text-color: #ffffff;
+            --text-color: #00FFFF;
             --input-bg-color: #1e1e1e;
             --input-border-color: #444;
-            --button-bg-color: #4caf50;
-            --button-text-color: #ffffff;
-            --progress-bg-color: #333;
-            --progress-bar-color: #007bff;
+            --button-bg-color: #1a1a1a;
+            --button-hover-color: #FF00FF;
+            --button-text-color: #00FFFF;
         }
 
         /* General styles */
         body {
-            background-color: var(--bg-color);
+            background: linear-gradient(to bottom, #0A0A0A, #121212 90%);
             color: var(--text-color);
-            font-family: Arial, sans-serif;
+            font-family: 'Orbitron', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
-        input, textarea, select, button {
+        input, textarea, select {
             background-color: var(--input-bg-color);
             color: var(--text-color);
             border: 1px solid var(--input-border-color);
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            font-family: 'Orbitron', Arial, sans-serif;
         }
 
         button {
             background-color: var(--button-bg-color);
             color: var(--button-text-color);
-            border: none;
+            border: 2px solid var(--text-color);
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
+            font-family: 'Orbitron', Arial, sans-serif;
+            text-transform: uppercase;
+            transition: 0.3s ease;
         }
 
         button:hover {
-            opacity: 0.9;
-        }
-
-        .progress-container {
-            width: 100%;
-            background-color: var(--progress-bg-color);
-            border: 1px solid var(--input-border-color);
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-
-        .progress-bar {
-            width: 0%;
-            height: 20px;
-            background-color: var(--progress-bar-color);
-            text-align: center;
-            color: var(--button-text-color);
-            line-height: 20px;
-            border-radius: 5px;
+            background-color: var(--button-hover-color);
+            color: #000;
+            box-shadow: 0 0 10px var(--button-hover-color);
         }
 
         .theme-toggle {
@@ -78,9 +63,43 @@
             background-color: var(--button-bg-color);
             color: var(--button-text-color);
             padding: 5px 10px;
-            border: none;
+            border: 2px solid var(--text-color);
             border-radius: 5px;
             cursor: pointer;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(10, 10, 10, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 0 20px var(--text-color);
+        }
+
+        .report-text {
+            font-family: 'Space Mono', monospace;
+            color: var(--text-color); /* Keeps consistent theme color */
+            line-height: 1.5; /* Optional for better readability */
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--text-color);
+            text-shadow: 0 0 8px var(--text-color);
+        }
+
+        #mario-loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            text-align: center;
+        }
+
+        #mario-loading img {
+            width: 100px;
         }
     </style>
 </head>
@@ -89,7 +108,7 @@
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
 
     <div class="container">
-        <h1>Smart Contract Analyzer</h1>
+        <h1>COMPLIANTELLIGENT - NOW COMPLY INTELLIGENTLY</h1>
 
         <form id="uploadForm" enctype="multipart/form-data">
             <label for="zipFile">Upload a ZIP File:</label>
@@ -107,97 +126,92 @@
             <button type="button" onclick="analyze()">Analyze</button>
         </form>
 
-        <div class="progress-container" style="display: none;">
-            <div id="progressBar" class="progress-bar">0%</div>
+        <div id="mario-loading" style="display: none;">
+            <img src="{{ url_for('static', filename='images/mario-jump.gif') }}" alt="Loading...">
         </div>
         
-
-        <div id="mario-loading" style="display: none; text-align: center;">
-            <img src="{{ url_for('static', filename='images/mario-jump.gif') }}" alt="Loading..." />
-        </div>
         <div id="results"></div>
-        
     </div>
 
     <script>
-async function analyze() {
-    const fileInput = document.getElementById('zipFile');
-    const checkboxes = document.querySelectorAll('input[name="eip"]:checked');
-    const progressContainer = document.querySelector('.progress-container');
-    const progressBar = document.getElementById('progressBar');
-    const resultsDiv = document.getElementById('results');
-    const marioLoading = document.getElementById('mario-loading'); // Mario animation
 
-    // Reset progress and results
-    progressBar.style.width = '0%';
-    progressBar.textContent = '0%';
-    resultsDiv.innerHTML = '';
-    progressContainer.style.display = 'none'; // Hide progress bar initially
-    marioLoading.style.display = 'none'; // Hide Mario animation initially
+        function displayResults(analysisResults) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h2>Analysis Results</h2>'; // Title for results
 
-    if (!fileInput.files.length) {
-        alert('Please upload a ZIP file.');
-        return;
-    }
+            for (const [filename, result] of Object.entries(analysisResults)) {
+                let html = `<h3 class="report-text">${filename}</h3>`; // Space Mono for filenames
 
-    if (checkboxes.length === 0) {
-        alert('Please select at least one EIP to analyze.');
-        return;
-    }
+                if (result.error) {
+                    html += `<p class="report-text">Error: ${result.error}</p>`;
+                } else {
+                    html += `<p class="report-text">OpenZeppelin Imports: ${result.oz_modules.join(', ')}</p>`;
+                    html += `<p class="report-text">EIP Compliance:</p><ul>`;
+                    for (const [eip, compliance] of Object.entries(result.compliance)) {
+                        html += `<li class="report-text">${eip}: ${compliance}</li>`;
+                    }
+                    html += '</ul>';
+                }
 
-    const formData = new FormData();
-    formData.append('zipFile', fileInput.files[0]);
-    const selectedEIPs = Array.from(checkboxes).map(cb => cb.value);
-    formData.append('eips', JSON.stringify(selectedEIPs));
-
-    // Show progress bar and Mario animation when analysis starts
-    progressContainer.style.display = 'block';
-    marioLoading.style.display = 'block';
-
-    try {
-        const response = await fetch('/analyze', {
-            method: 'POST',
-            body: formData
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            // Process results
-            progressBar.style.width = '100%';
-            progressBar.textContent = '100%';
-            displayResults(data.data);
-        } else {
-            // Show error message
-            alert(data.error || 'An error occurred while analyzing the files.');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An unexpected error occurred. Please try again.');
-    } finally {
-        // Hide Mario animation when analysis is complete
-        marioLoading.style.display = 'none';
-    }
-}
-
-function displayResults(analysisResults) {
-    const resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = '<h2>Analysis Results</h2>';
-    for (const [filename, result] of Object.entries(analysisResults)) {
-        let html = `<h3>${filename}</h3>`;
-        if (result.error) {
-            html += `<p>Error: ${result.error}</p>`;
-        } else {
-            html += `<p>OpenZeppelin Imports: ${result.oz_modules.join(', ')}</p>`;
-            html += `<p>EIP Compliance:</p><ul>`;
-            for (const [eip, compliance] of Object.entries(result.compliance)) {
-                html += `<li>${eip}: ${compliance}</li>`;
+                resultsDiv.innerHTML += html;
             }
-            html += '</ul>';
         }
-        resultsDiv.innerHTML += html;
-    }
-}
+
+
+        async function analyze() {
+            const fileInput = document.getElementById('zipFile');
+            const checkboxes = document.querySelectorAll('input[name="eip"]:checked');
+            const resultsDiv = document.getElementById('results');
+            const marioLoading = document.getElementById('mario-loading');
+
+            // Reset results and hide the animation initially
+            resultsDiv.innerHTML = '';
+            marioLoading.style.display = 'none';
+
+            if (!fileInput.files.length) {
+                alert('Please upload a ZIP file.');
+                return;
+            }
+
+            if (checkboxes.length === 0) {
+                alert('Please select at least one EIP to analyze.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('zipFile', fileInput.files[0]);
+            const selectedEIPs = Array.from(checkboxes).map(cb => cb.value);
+            formData.append('eips', JSON.stringify(selectedEIPs));
+
+            // Show the Mario animation with "Analyzing..." text
+            marioLoading.style.display = 'block';
+
+            try {
+                console.log('Sending fetch request to /analyze...');
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                console.log('Received response:', response);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Parsed JSON data:', data);
+
+                // Display the analysis results
+                displayResults(data.data);
+            } catch (error) {
+                console.error('Error during analysis:', error);
+                alert('An unexpected error occurred. Please try again.');
+            } finally {
+                // Hide the Mario animation when analysis is complete
+                marioLoading.style.display = 'none';
+            }
+        }
 
     </script>
 </body>
