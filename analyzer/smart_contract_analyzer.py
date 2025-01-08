@@ -1,5 +1,6 @@
 import openai
 from typing import List, Dict
+from solidityscan import SolidityScan  # Import SolidityScan SDK
 
 
 class SmartContractAnalyzer:
@@ -14,12 +15,12 @@ class SmartContractAnalyzer:
         self.api_key = api_key
         openai.api_key = self.api_key  # Set globally
 
-                # Debugging: Print the API key being used
+        # Debugging: Print the API key being used
         print(f"Initializing with API key: {self.api_key}")
 
     def analyze_contract(self, contract_code: str, selected_eips: List[str]) -> Dict:
         """
-        Analyze a single contract for OpenZeppelin imports and EIP compliance.
+        Analyze a single contract for OpenZeppelin imports, EIP compliance, and SolidityScan results.
         """
         # Analyze OpenZeppelin imports
         oz_imports = self.analyze_oz_imports(contract_code)
@@ -27,9 +28,13 @@ class SmartContractAnalyzer:
         # Check EIP compliance
         compliance = self.check_eip_compliance(contract_code, oz_imports, selected_eips)
 
+        # Run SolidityScan analysis
+        solidityscan_results = self.run_solidityscan_scan(contract_code)
+
         return {
             'oz_modules': oz_imports,
             'compliance': compliance,
+            'solidityscan_results': solidityscan_results,
         }
 
     def analyze_oz_imports(self, contract_code: str) -> List[str]:
@@ -87,6 +92,17 @@ class SmartContractAnalyzer:
 
         return results
 
+    def run_solidityscan_scan(self, contract_code: str) -> Dict:
+        """
+        Run SolidityScan analysis on the provided contract code.
+        """
+        try:
+            scan = SolidityScan()
+            results = scan.scan(scan_type="code", code=contract_code)
+            return results
+        except Exception as e:
+            return {"error": f"SolidityScan error: {str(e)}"}
+
     def check_functions(self, contract_code: str, required_functions: List[str]) -> Dict:
         """
         Check for required functions and compliance with standards.
@@ -121,6 +137,12 @@ class SmartContractAnalyzer:
             report += "- EIP Compliance:\n"
             for eip, status in data['compliance'].items():
                 report += f"  - {eip}: {status}\n"
+
+            if "solidityscan_results" in data:
+                report += "- SolidityScan Results:\n"
+                for issue in data["solidityscan_results"].get("issues", []):
+                    report += f"  - {issue['severity']}: {issue['description']}\n"
+
             report += "\n"
 
         return report
