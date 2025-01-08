@@ -26,3 +26,9 @@ python app.py
 - If the current smart contract is interacting with the EIP contract such as an ERC20 token, then it means that the smart contract is not conforming to the 
 - EIP and the EIP standard Openzeppelin contract is just being used for interaction purposes
 - But if the smart contract is actually inheriting this standard EIP contract or standard then it means that it is conforming to the standard.
+
+## Target Users
+- If you are a non-tech guy, a business head then this product is for you
+- If you are a regulator then this product is for you
+- If you are an investor and want to better understand a project, or to check if it really complies then this product is for you
+- If you are a platform and want to ensure compliance/self-compliance between projects, then this product is for you
