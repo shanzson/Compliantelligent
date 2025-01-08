@@ -5,7 +5,8 @@
 2. Run:
 ```pip3 install flask openai==0.28 python-dotenv
 pip3 install python-dotenv
-python app.py```
+python app.py
+```
 
 ## Debugging
 - If you get errors then make sure you have set the OpenAI API keys properly or not
