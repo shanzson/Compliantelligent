@@ -7,6 +7,11 @@
 pip3 install python-dotenv
 python app.py
 ```
+# Target Users
+- If you are a non-tech guy, a business head then this product is for you
+- If you are a regulator then this product is for you
+- If you are an investor and want to better understand a project, then this product
+- If you are a platform and want to ensure compliance/self-compliance between projects, then this product is for you
 
 ## Debugging
 - If you get errors then make sure you have set the OpenAI API keys properly or not
