@@ -1,0 +1,2 @@
+[console_scripts]
+solidityscan = solidityscan_agent.__init__:solidityscan

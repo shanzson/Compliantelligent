@@ -1,0 +1,32 @@
+Metadata-Version: 2.1
+Name: solidityscan
+Version: 0.2.1
+Summary: Get your smart contracts audited by a smarter tool
+Home-page: https://solidityscan.com
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: anyio==3.6.2
+Requires-Dist: beautifulsoup4==4.12.2
+Requires-Dist: certifi==2023.5.7
+Requires-Dist: chardet==5.1.0
+Requires-Dist: charset-normalizer==2.1.1
+Requires-Dist: click==8.1.3
+Requires-Dist: deep-translator==1.10.1
+Requires-Dist: h11==0.14.0
+Requires-Dist: h2==4.1.0
+Requires-Dist: hpack==4.0.0
+Requires-Dist: hstspreload==2023.1.1
+Requires-Dist: httpcore==0.17.0
+Requires-Dist: httpx==0.24.0
+Requires-Dist: hyperframe==6.0.1
+Requires-Dist: idna==3.4
+Requires-Dist: loguru==0.7.0
+Requires-Dist: requests==2.30.0
+Requires-Dist: rfc3986==2.0.0
+Requires-Dist: ruamel.yaml==0.18.6
+Requires-Dist: ruamel.yaml.clib==0.2.12
+Requires-Dist: sniffio==1.3.0
+Requires-Dist: soupsieve==2.4.1
+Requires-Dist: urllib3==1.26.4
+
+refer: https://manos-organization.gitbook.io/api-docs/
