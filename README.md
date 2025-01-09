@@ -7,6 +7,8 @@
 pip3 install python-dotenv
 python app.py
 ```
+3. Check the versions of packages that should be installed in `requirements.txt`
+ 
 # Target Users
 - If you are a non-tech guy, a business head then this product is for you
 - If you are a regulator then this product is for you
