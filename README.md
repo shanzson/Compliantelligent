@@ -8,12 +8,17 @@
  
 
 - Set .env variables
-
 - Run:
 ```pip3 install flask openai==0.28 python-dotenv
 pip3 install python-dotenv
 python app.py```
 
+or
+
+```
+pip install -r requirements.txt
+brew install python-flask
+```
 - Debugging:
 If you get errors then make sure you have set the OpenAI API keys properly or not
 
@@ -24,6 +29,10 @@ source myenv/bin/activate
 pip install flask
 python app.py
 ```
+
+- For Solidityscan, make sure the following dependencies are met:
+`solidityscan 0.2.1 requires requests==2.30.0, but you have requests 2.32.3 which is incompatible.`
+`solidityscan 0.2.1 requires urllib3==1.26.4, but you have urllib3 2.3.0 which is incompatible.`
 
 - Methodology:
 We check whether there are openzeppelin standard libraries being imported

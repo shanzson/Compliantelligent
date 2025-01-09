@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Smart Contract Analyzer</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Compliantelligent</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
 
     <style>
-        /* Define light and dark theme variables */
         :root {
             --bg-color: #121212;
             --text-color: #00FFFF;
@@ -18,54 +16,12 @@
             --button-text-color: #00FFFF;
         }
 
-        /* General styles */
         body {
             background: linear-gradient(to bottom, #0A0A0A, #121212 90%);
             color: var(--text-color);
             font-family: 'Orbitron', Arial, sans-serif;
             margin: 0;
             padding: 0;
-        }
-
-        input, textarea, select {
-            background-color: var(--input-bg-color);
-            color: var(--text-color);
-            border: 1px solid var(--input-border-color);
-            padding: 10px;
-            width: 100%;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            font-family: 'Orbitron', Arial, sans-serif;
-        }
-
-        button {
-            background-color: var(--button-bg-color);
-            color: var(--button-text-color);
-            border: 2px solid var(--text-color);
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'Orbitron', Arial, sans-serif;
-            text-transform: uppercase;
-            transition: 0.3s ease;
-        }
-
-        button:hover {
-            background-color: var(--button-hover-color);
-            color: #000;
-            box-shadow: 0 0 10px var(--button-hover-color);
-        }
-
-        .theme-toggle {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background-color: var(--button-bg-color);
-            color: var(--button-text-color);
-            padding: 5px 10px;
-            border: 2px solid var(--text-color);
-            border-radius: 5px;
-            cursor: pointer;
         }
 
         .container {
@@ -77,142 +33,543 @@
             box-shadow: 0 0 20px var(--text-color);
         }
 
-        .report-text {
-            font-family: 'Space Mono', monospace;
-            color: var(--text-color); /* Keeps consistent theme color */
-            line-height: 1.5; /* Optional for better readability */
-        }
-
         h1, h2 {
             text-align: center;
             color: var(--text-color);
             text-shadow: 0 0 8px var(--text-color);
         }
 
-        #mario-loading {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-            text-align: center;
+        label {
+            color: var(--text-color);
+            text-shadow: 0 0 4px var(--text-color);
         }
 
-        #mario-loading img {
-            width: 100px;
+        input[type="text"], input[type="file"], textarea, select {
+            background-color: rgba(30, 30, 30, 0.7);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            font-family: 'Orbitron', Arial, sans-serif;
+            box-shadow: 0 0 5px var(--text-color);
         }
+
+        input[type="checkbox"] {
+            accent-color: var(--text-color);
+        }
+
+        button {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 2px solid var(--text-color);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', Arial, sans-serif;
+            text-transform: uppercase;
+            transition: 0.3s ease;
+            text-shadow: 0 0 4px var(--text-color);
+            box-shadow: 0 0 10px var(--text-color);
+        }
+
+        button:hover {
+            background-color: var(--text-color);
+            color: #000;
+            box-shadow: 0 0 20px var(--text-color);
+        }
+
+        .show-advanced {
+            color: var(--text-color);
+            text-decoration: none;
+            cursor: pointer;
+            text-shadow: 0 0 4px var(--text-color);
+            margin: 10px 0;
+            display: inline-block;
+        }
+
+        .advanced-options {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            border: 1px solid var(--text-color);
+            border-radius: 5px;
+            box-shadow: 0 0 10px var(--text-color);
+            background-color: rgba(10, 10, 10, 0.9);
+        }
+
+        .progress-container {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: rgba(30, 30, 30, 0.7);
+            border: 1px solid var(--text-color);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px var(--text-color);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--text-color);
+            box-shadow: 0 0 10px var(--text-color);
+            transition: width 0.3s ease;
+        }
+
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid var(--text-color);
+            border-radius: 5px;
+            background-color: rgba(30, 30, 30, 0.7);
+            box-shadow: 0 0 10px var(--text-color);
+        }
+
+        .severity-high {
+            color: #FF4444;
+            text-shadow: 0 0 4px #FF4444;
+        }
+
+        .severity-medium {
+            color: #FFAA00;
+            text-shadow: 0 0 4px #FFAA00;
+        }
+
+        .severity-low {
+            color: #FFFF00;
+            text-shadow: 0 0 4px #FFFF00;
+        }
+
+        .severity-info {
+            color: #00FF00;
+            text-shadow: 0 0 4px #00FF00;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: var(--text-color);
+            box-shadow: 0 0 10px var(--text-color);
+            margin: 30px 0;
+        }
+
+        .result-container {
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid var(--text-color);
+        border-radius: 5px;
+        background-color: rgba(30, 30, 30, 0.7);
+        box-shadow: 0 0 10px var(--text-color);
+    }
+
+    .imports-section, .compliance-section {
+        margin: 15px 0;
+        padding: 15px;
+        border-left: 3px solid var(--text-color);
+        background-color: rgba(20, 20, 20, 0.7);
+    }
+
+    .compliance-item {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 3px;
+        background-color: rgba(40, 40, 40, 0.7);
+    }
+
+    .compliance-details {
+        margin-top: 5px;
+        padding-left: 20px;
+    }
+
+    .compliance-reason {
+        margin-top: 8px;
+        padding: 8px;
+        background-color: rgba(0, 0, 0, 0.3);
+        border-left: 2px solid var(--text-color);
+        font-family: 'Space Mono', monospace;
+        font-size: 0.9em;
+    }
+
+    .error-container {
+        border: 2px solid #FF4444;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 20px;
+        background-color: rgba(255, 68, 68, 0.1);
+    }
+
+    /* Updated severity classes with more distinct styling */
+    .severity-high {
+        border-left: 4px solid #FF4444;
+        background-color: rgba(255, 68, 68, 0.1);
+    }
+
+    .severity-info {
+        border-left: 4px solid #00FF00;
+        background-color: rgba(0, 255, 0, 0.1);
+    }
+
+    /* Animation for results appearing */
+    .result-container {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
     </style>
 </head>
 <body>
-    <!-- Theme toggle button -->
-    <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
-
     <div class="container">
-        <h1>COMPLIANTELLIGENT - NOW COMPLY INTELLIGENTLY</h1>
+        <h1>COMPLIANTELLIGENT</h1>
+        <div style="text-align: center">
+            <h4>NOW COMPLY INTELLIGENTLY</h4>
+            <br><br>
+        </div>
 
+        <!-- Original Form -->
         <form id="uploadForm" enctype="multipart/form-data">
             <label for="zipFile">Upload a ZIP File:</label>
             <input type="file" id="zipFile" name="zipFile" accept=".zip">
             <br><br>
 
             <label>Select EIPs to Analyze:</label>
-            <div>
-                <input type="checkbox" value="ERC20" name="eip"> ERC20
-                <input type="checkbox" value="ERC721" name="eip"> ERC721
-                <input type="checkbox" value="ERC1155" name="eip"> ERC1155
+            <br><br>
+
+            <div style="display: flex; flex-direction: column; gap: 20px; align-items: start;">
+                <div style="display: flex; align-items: center; gap: 105px;">
+                    <label for="erc20">ERC20</label>
+                    <input type="checkbox" value="ERC20" name="eip" id="erc20">
+                </div>
+                <div style="display: flex; align-items: center; gap: 100px;">
+                    <label for="erc721">ERC721</label>
+                    <input type="checkbox" value="ERC721" name="eip" id="erc721">
+                </div>
+                <div style="display: flex; align-items: center; gap: 90px;">
+                    <label for="erc1155">ERC1155</label>
+                    <input type="checkbox" value="ERC1155" name="eip" id="erc1155">
+                </div>
             </div>
             <br>
 
-            <button type="button" onclick="analyze()">Analyze</button>
+            <button type="button" onclick="analyze()">ANALYZE</button>
         </form>
 
-        <div id="mario-loading" style="display: none;">
-            <img src="{{ url_for('static', filename='images/mario-jump.gif') }}" alt="Loading...">
+        <hr>
+
+        <!-- SolidityScan Form -->
+        <h2>Run SolidityScan Analysis</h2>
+        <form id="solidityscanForm">
+            <label for="projectUrl">Project URL:</label>
+            <input type="text" id="projectUrl" name="project_url" placeholder="Enter GitHub repository URL">
+            
+            <label for="projectBranch">Project Branch:</label>
+            <input type="text" id="projectBranch" name="project_branch" value="main" placeholder="Enter branch name">
+            
+            <div class="show-advanced" onclick="toggleAdvancedOptions()">ADVANCED OPTIONS +</div>
+            
+            <div id="advancedOptions" class="advanced-options">
+                <label for="provider">Git Provider:</label>
+                <select id="provider" name="provider">
+                    <option value="github">GitHub</option>
+                    <option value="gitlab">GitLab</option>
+                    <option value="bitbucket">BitBucket</option>
+                </select>
+
+                <label for="projectName">Project Name (optional):</label>
+                <input type="text" id="projectName" name="project_name" placeholder="Custom project name">
+
+                <label for="skipPaths">Skip File Paths (one per line):</label>
+                <textarea id="skipPaths" name="skip_file_paths" placeholder="tests/&#10;examples/&#10;docs/" rows="4"></textarea>
+            </div>
+
+            <button type="button" onclick="runSolidityScan()">RUN SOLIDITYSCAN</button>
+        </form>
+
+        <div id="progress" class="progress-container">
+            <p>Analyzing smart contracts...</p>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+            </div>
         </div>
-        
+
         <div id="results"></div>
     </div>
 
     <script>
-
-        function displayResults(analysisResults) {
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<h2>Analysis Results</h2>'; // Title for results
-
-            for (const [filename, result] of Object.entries(analysisResults)) {
-                let html = `<h3 class="report-text">${filename}</h3>`; // Space Mono for filenames
-
-                if (result.error) {
-                    html += `<p class="report-text">Error: ${result.error}</p>`;
-                } else {
-                    html += `<p class="report-text">OpenZeppelin Imports: ${result.oz_modules.join(', ')}</p>`;
-                    html += `<p class="report-text">EIP Compliance:</p><ul>`;
-                    for (const [eip, compliance] of Object.entries(result.compliance)) {
-                        html += `<li class="report-text">${eip}: ${compliance}</li>`;
-                    }
-                    html += '</ul>';
-                }
-
-                resultsDiv.innerHTML += html;
-            }
-        }
-
-
         async function analyze() {
             const fileInput = document.getElementById('zipFile');
             const checkboxes = document.querySelectorAll('input[name="eip"]:checked');
             const resultsDiv = document.getElementById('results');
-            const marioLoading = document.getElementById('mario-loading');
 
-            // Reset results and hide the animation initially
             resultsDiv.innerHTML = '';
-            marioLoading.style.display = 'none';
 
+            // Validate file upload
             if (!fileInput.files.length) {
                 alert('Please upload a ZIP file.');
                 return;
             }
 
+            // Validate EIP selection
             if (checkboxes.length === 0) {
                 alert('Please select at least one EIP to analyze.');
                 return;
             }
 
+            // Prepare form data
             const formData = new FormData();
             formData.append('zipFile', fileInput.files[0]);
             const selectedEIPs = Array.from(checkboxes).map(cb => cb.value);
             formData.append('eips', JSON.stringify(selectedEIPs));
 
-            // Show the Mario animation with "Analyzing..." text
-            marioLoading.style.display = 'block';
+            // Show loading state
+            const progress = document.getElementById('progress');
+            const progressFill = document.getElementById('progressFill');
+            progress.style.display = 'block';
+            progressFill.style.width = '0%';
+            startProgress();
 
             try {
-                console.log('Sending fetch request to /analyze...');
                 const response = await fetch('/analyze', {
                     method: 'POST',
                     body: formData
                 });
-
-                console.log('Received response:', response);
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const data = await response.json();
-                console.log('Parsed JSON data:', data);
+                
+                // Updated results formatting
+                let html = '<h3>Analysis Results</h3>';
+                for (const [filename, result] of Object.entries(data.data)) {
+                    html += `
+                        <div class="result-container">
+                            <h4>${filename}</h4>
+                            ${result.error ? 
+                                `<p class="severity-high">Error: ${result.error}</p>` :
+                                `
+                                <div class="imports-section">
+                                    <h5>OpenZeppelin Imports:</h5>
+                                    <p>${result.oz_modules.join('<br>') || 'None'}</p>
+                                </div>
+                                
+                                <div class="compliance-section">
+                                    <h5>EIP Compliance:</h5>
+                                    ${Object.entries(result.compliance).map(([eip, status]) => {
+                                        // Check if status is a string (detailed explanation) or boolean
+                                        const isCompliant = typeof status === 'string' ? 
+                                            status.includes('✅') : 
+                                            status;
+                                        
+                                        const statusText = typeof status === 'string' ? 
+                                            status : 
+                                            (status ? 'Compliant' : 'Non-compliant');
+                                        
+                                        const statusClass = isCompliant ? 
+                                            'severity-info' : 
+                                            'severity-high';
+                                        
+                                        return `
+                                            <div class="compliance-item ${statusClass}">
+                                                <strong>${eip}:</strong> 
+                                                <div class="compliance-details">
+                                                    ${statusText}
+                                                    ${typeof status === 'string' && status.includes('Reason:') ?
+                                                        `<div class="compliance-reason">
+                                                            ${status.split('Reason:')[1]}
+                                                        </div>` :
+                                                        ''
+                                                    }
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                                `
+                            }
+                        </div>
+                    `;
+                }
+                resultsDiv.innerHTML = html;
 
-                // Display the analysis results
-                displayResults(data.data);
             } catch (error) {
                 console.error('Error during analysis:', error);
-                alert('An unexpected error occurred. Please try again.');
+                resultsDiv.innerHTML = `
+                    <div class="error-container">
+                        <h3>Error</h3>
+                        <p>An unexpected error occurred. Please try again.</p>
+                        <p>Details: ${error.message}</p>
+                    </div>
+                `;
             } finally {
-                // Hide the Mario animation when analysis is complete
-                marioLoading.style.display = 'none';
+                progress.style.display = 'none';
+                stopProgress();
             }
         }
 
+        function toggleAdvancedOptions() {
+            const advancedOptions = document.getElementById('advancedOptions');
+            const showAdvanced = document.querySelector('.show-advanced');
+            if (advancedOptions.style.display === 'none' || !advancedOptions.style.display) {
+                advancedOptions.style.display = 'block';
+                showAdvanced.textContent = 'ADVANCED OPTIONS -';
+            } else {
+                advancedOptions.style.display = 'none';
+                showAdvanced.textContent = 'ADVANCED OPTIONS +';
+            }
+        }
+
+        async function runSolidityScan() {
+            const formData = new FormData();
+            const projectUrl = document.getElementById('projectUrl').value;
+            const projectBranch = document.getElementById('projectBranch').value;
+            const provider = document.getElementById('provider').value;
+            const projectName = document.getElementById('projectName').value;
+            const skipPaths = document.getElementById('skipPaths').value
+                .split('\n')
+                .map(path => path.trim())
+                .filter(path => path);
+
+            // Debug log the values
+            console.log('Debug: Form Values', {
+                projectUrl,
+                projectBranch,
+                provider,
+                projectName,
+                skipPaths
+            });
+
+            // Validate required fields
+            if (!projectUrl) {
+                alert('Please enter a project URL');
+                return;
+            }
+
+            formData.append('project_url', projectUrl);
+            formData.append('project_branch', projectBranch || 'main');
+            formData.append('provider', provider);
+            
+            if (projectName) {
+                formData.append('project_name', projectName);
+            }
+            
+            if (skipPaths.length > 0) {
+                formData.append('skip_file_paths', JSON.stringify(skipPaths));
+            }
+
+            // Debug log the FormData
+            console.log('Debug: FormData entries:');
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+
+            const progress = document.getElementById('progress');
+            const progressFill = document.getElementById('progressFill');
+            const resultsDiv = document.getElementById('results');
+
+            progress.style.display = 'block';
+            progressFill.style.width = '0%';
+            resultsDiv.innerHTML = '';
+            startProgress();
+
+            try {
+                console.log('Debug: Sending request to /solidityscan');
+                const response = await fetch('/solidityscan', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                stopProgress();
+                const data = await response.json();
+                console.log('Debug: Response received:', data);
+                
+                if (data.status === 'error') {
+                    resultsDiv.innerHTML = `
+                        <div style="border: 2px solid #FF4444; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                            <h3 style="color: #FF4444;">Error</h3>
+                            <p>${data.message}</p>
+                            ${data.error_details ? `<p>Details: ${JSON.stringify(data.error_details, null, 2)}</p>` : ''}
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '<h3>SolidityScan Results</h3>';
+                
+                if (data.results && data.results.issues) {
+                    const issuesByFile = {};
+                    data.results.issues.forEach(issue => {
+                        if (!issuesByFile[issue.file]) {
+                            issuesByFile[issue.file] = [];
+                        }
+                        issuesByFile[issue.file].push(issue);
+                    });
+
+                    Object.entries(issuesByFile).forEach(([file, issues]) => {
+                        html += `
+                            <div style="margin: 20px 0; padding: 15px; border: 1px solid var(--text-color); border-radius: 5px;">
+                                <h4>${file}</h4>
+                                ${issues.map(issue => `
+                                    <div class="severity-${issue.severity.toLowerCase()}" style="margin: 10px 0;">
+                                        <strong>${issue.severity}</strong>: ${issue.description}
+                                        ${issue.line ? `<br>Line: ${issue.line}` : ''}
+                                        ${issue.snippet ? `<br>Code: <pre>${issue.snippet}</pre>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += '<p>No issues found. Your code looks good!</p>';
+                }
+
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                console.error("Error running SolidityScan:", error);
+                resultsDiv.innerHTML = `
+                    <div style="border: 2px solid #FF4444; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                        <h3 style="color: #FF4444;">Error</h3>
+                        <p>An unexpected error occurred. Please try again later.</p>
+                        <p>Details: ${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                progress.style.display = 'none';
+            }
+        }
+        let progressInterval;
+        function startProgress() {
+            const progressFill = document.getElementById('progressFill');
+            let width = 0;
+            progressInterval = setInterval(() => {
+                if (width >= 90) {
+                    clearInterval(progressInterval);
+                } else {
+                    width += 1;
+                    progressFill.style.width = width + '%';
+                }
+            }, 500);
+        }
+
+        function stopProgress() {
+            clearInterval(progressInterval);
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = '100%';
+        }
     </script>
 </body>
 </html>
