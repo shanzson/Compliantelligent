@@ -1,4 +1,4 @@
-# Compliantelligent
+# Compliantelligent - _Now Comply Intelligently_
 
 # Try out the Project [Here](https://app.aiapocalypto.com/compliant)
 
