@@ -369,34 +369,19 @@
                                 <div class="compliance-section">
                                     <h5>EIP Compliance:</h5>
                                     ${Object.entries(result.compliance).map(([eip, status]) => {
-                                        // Check if status is a string (detailed explanation) or boolean
-                                        const isCompliant = typeof status === 'string' ? 
-                                            status.includes('✅') : 
-                                            status;
-                                        
-                                        const statusText = typeof status === 'string' ? 
-                                            status : 
-                                            (status ? 'Compliant' : 'Non-compliant');
-                                        
-                                        const statusClass = isCompliant ? 
-                                            'severity-info' : 
-                                            'severity-high';
+                                        const isCompliant = status.includes('✅');
+                                        const statusClass = isCompliant ? 'severity-info' : 'severity-high';
                                         
                                         return `
                                             <div class="compliance-item ${statusClass}">
                                                 <strong>${eip}:</strong> 
                                                 <div class="compliance-details">
-                                                    ${statusText}
-                                                    ${typeof status === 'string' && status.includes('Reason:') ?
-                                                        `<div class="compliance-reason">
-                                                            ${status.split('Reason:')[1]}
-                                                        </div>` :
-                                                        ''
-                                                    }
+                                                    ${status}
                                                 </div>
                                             </div>
                                         `;
                                     }).join('')}
+
                                 </div>
                                 `
                             }
@@ -533,7 +518,7 @@
                         `;
                     });
                 } else {
-                    html += '<p>No issues found. Your code looks good!</p>';
+                    html += '<p>Scan Completed! Please check your SolidityScan Dashboard!</p>';
                 }
 
                 resultsDiv.innerHTML = html;

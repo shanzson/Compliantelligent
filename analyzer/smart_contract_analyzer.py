@@ -54,59 +54,53 @@ class SmartContractAnalyzer:
 
     def check_eip_compliance(self, contract_code: str, oz_imports: List[str], selected_eips: List[str]) -> Dict:
         """
-        Check EIP compliance based on OpenZeppelin imports and inheritance patterns.
-        Logic:
-        1. Check for OpenZeppelin imports
-        2. Check if EIP standard contracts are imported
-        3. Determine if the contract inherits from or just interacts with the EIP standard
+        Check EIP compliance using GPT-4 analysis.
         """
         results = {}
         
-        # First check if there are any OpenZeppelin imports
-        has_oz_imports = any("openzeppelin" in imp.lower() for imp in oz_imports)
-        
         for eip in selected_eips:
             try:
-                if not has_oz_imports:
-                    results[eip] = f"❌ Does not comply with {eip}. Reason: No OpenZeppelin imports found"
-                    continue
+                messages = [
+                    {"role": "system", "content": "You are an AI assistant analyzing Solidity smart contracts."},
+                    {
+                        "role": "user",
+                        "content": f"""Analyze this Solidity contract carefully for {eip} compliance. Answer these questions in sequence:
 
-                # Check for specific EIP standard imports
-                eip_import_patterns = {
-                    'ERC20': '@openzeppelin/contracts/token/ERC20/ERC20.sol',
-                    'ERC721': '@openzeppelin/contracts/token/ERC721/ERC721.sol',
-                    'ERC1155': '@openzeppelin/contracts/token/ERC1155/ERC1155.sol'
-                }
-                
-                # Check if this EIP's standard contract is imported
-                eip_import = eip_import_patterns.get(eip, '')
-                if eip_import not in str(oz_imports):
-                    results[eip] = f"❌ Does not comply with {eip}. Reason: No {eip} standard contract import found"
-                    continue
+                        1. Are any OpenZeppelin contracts being imported? List them.
+                        2. Specifically, is any OpenZeppelin {eip} related contract being imported? This includes any contract from OpenZeppelin's token/{eip} directory.
+                        3. If yes to #2, analyze whether the contract inherits from the {eip} standard (implements it) or just interacts with {eip} contracts.
 
-                # Check inheritance vs interaction
-                # Look for inheritance patterns
-                inheritance_patterns = {
-                    'ERC20': ['contract', 'is', 'ERC20'],
-                    'ERC721': ['contract', 'is', 'ERC721'],
-                    'ERC1155': ['contract', 'is', 'ERC1155']
-                }
+                        Important: There are many valid import paths for OpenZeppelin contracts. Check for any import containing 'openzeppelin' and '{eip.lower()}', even if it's not the standard path.
+                        
+                        Contract code:
+                        {contract_code}
+                        
+                        Provide your analysis in a clear format stating whether the contract Complies or Does not comply with {eip}, followed by your reasoning."""
+                    }
+                ]
+
+                response = openai.ChatCompletion.create(
+                    model="gpt-4",
+                    messages=messages,
+                    temperature=0
+                )
+
+                analysis = response['choices'][0]['message']['content'].strip()
                 
-                # Check if contract inherits from the standard
-                pattern = inheritance_patterns.get(eip, [])
-                is_inheriting = all(p in contract_code for p in pattern)
+                # Check the analysis for compliance
+                compliant = "Complies" in analysis
                 
-                if is_inheriting:
-                    results[eip] = f"✅ Complies with {eip} (inherits OpenZeppelin's {eip})"
+                if compliant:
+                    results[eip] = f"✅ Complies with {eip}"
                 else:
-                    # Contract imports but doesn't inherit - means it's just using for interaction
-                    results[eip] = f"❌ Does not comply with {eip}. Reason: The contract imports but does not inherit from {eip}, suggesting it only interacts with {eip} tokens"
+                    # Extract the reason for non-compliance
+                    reason = analysis.split("Reason:")[1].split(".")[0].strip() if "Reason:" in analysis else analysis
+                    results[eip] = f"❌ Does not comply with {eip}. Reason: {reason}"
 
             except Exception as e:
                 results[eip] = f"❌ Error during {eip} analysis: {str(e)}"
-                
-        return results
 
+        return results
 
     def run_solidityscan_scan(self, contract_code: str) -> Dict:
         """
