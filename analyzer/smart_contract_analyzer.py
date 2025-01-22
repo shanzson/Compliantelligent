@@ -1,7 +1,7 @@
 import openai
 from typing import List, Dict
 # from solidityscan import SolidityScan
-
+## SECRET_KEY=popeyethesailorman
 
 class SmartContractAnalyzer:
     def __init__(self, api_key: str):
